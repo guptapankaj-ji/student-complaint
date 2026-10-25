@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Complaint Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(91, 76, 255, 0.45), transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(0, 200, 255, 0.30), transparent 30%),
+                radial-gradient(circle at 80% 15%, rgba(255, 80, 180, 0.22), transparent 25%),
+                linear-gradient(135deg, #080d1c, #111a35 50%, #071522);
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: rgba(82, 72, 255, 0.22);
+            filter: blur(70px);
+            top: -100px;
+            left: -100px;
+            animation: floatOne 7s ease-in-out infinite;
+        }
+        body::after {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(0, 210, 255, 0.18);
+            filter: blur(70px);
+            bottom: -100px;
+            right: -80px;
+            animation: floatTwo 8s ease-in-out infinite;
+        }
+        @keyframes floatOne {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(70px, 50px);
+            }
+        }
+        @keyframes floatTwo {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(-50px, -40px);
+            }
+        }
+        /* Background circles */
+        .background-shapes {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .shape {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+        }
+        .shape.one {
+            width: 150px;
+            height: 150px;
+            top: 12%;
+            left: 8%;
+            animation: rotateShape 15s linear infinite;
+        }
+        .shape.two {
+            width: 90px;
+            height: 90px;
+            bottom: 15%;
+            left: 15%;
+            animation: rotateShape 12s linear infinite reverse;
+        }
+        .shape.three {
+            width: 180px;
+            height: 180px;
+            top: 8%;
+            right: 8%;
+            animation: rotateShape 18s linear infinite;
+        }
+        .shape.four {
+            width: 70px;
+            height: 70px;
+            bottom: 10%;
+            right: 18%;
+            animation: rotateShape 10s linear infinite reverse;
+        }
+        @keyframes rotateShape {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        /* Main wrapper */
+        .page-wrapper {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* Login Card */
+        .container {
+            width: 380px;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+        /* Logo */
+        .logo {
+            width: 76px;
+            height: 76px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 22px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(90, 120, 255, 0.25);
+        }
+        .logo svg {
+            width: 52px;
+            height: 52px;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+        }
+        .subtitle {
+            text-align: center;
+            margin: 8px 0 25px;
+            color: #cdd5e7;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            color: #e8ecf5;
+        }
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            outline: none;
+            border-radius: 10px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.94);
+            color: #243b55;
+            transition: 0.3s;
+        }
+        input:focus,
+        select:focus {
+            border-color: rgba(120, 150, 255, 0.8);
+            box-shadow:
+                0 0 0 3px rgba(100, 120, 255, 0.12),
+                0 0 20px rgba(100, 120, 255, 0.15);
+        }
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(
+                135deg,
+                #ffffff,
+                #dfe7ff
+            );
+            color: #17243d;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.18);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 12px 28px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(170, 190, 255, 0.2);
+        }
+        button:active {
+            transform: translateY(-1px);
+        }
+        .register-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #cdd5e7;
+        }
+        .register-text a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .register-text a:hover {
+            text-decoration: underline;
+        }
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+        /* =========================
+           PROJECT CREDIT
+        ========================= */
+        .project-credit {
+            margin-top: 18px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 12px;
+            letter-spacing: 0.4px;
+            line-height: 1.7;
+        }
+        .project-credit .project-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+        .project-credit .creator {
+            color: rgba(200, 215, 255, 0.75);
+        }
+        @media (max-width: 450px) {
+            .container {
+                width: 90%;
+                padding: 30px 25px;
+            }
+            .shape.one,
+            .shape.three {
+                opacity: 0.5;
+            }
+            .project-credit {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Decorations -->
+    <div class="background-shapes">
+        <div class="shape one"></div>
+        <div class="shape two"></div>
+        <div class="shape three"></div>
+        <div class="shape four"></div>
+    </div>
+    <div class="page-wrapper">
+        <!-- Login Card -->
+        <div class="container">
+            <!-- Custom Logo -->
+            <div class="logo">
+                <svg viewBox="0 0 100 100"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <rect x="22"
+                          y="12"
+                          width="56"
+                          height="72"
+                          rx="10"
+                          fill="#243b55"/>
+                    <path d="M62 12 L78 28 L62 28 Z"
+                          fill="#526d8d"/>
+                    <rect x="34"
+                          y="38"
+                          width="30"
+                          height="5"
+                          rx="2.5"
+                          fill="white"/>
+                    <rect x="34"
+                          y="49"
+                          width="23"
+                          height="5"
+                          rx="2.5"
+                          fill="white"/>
+                    <circle cx="67"
+                            cy="70"
+                            r="18"
+                            fill="#4ade80"/>
+                    <path d="M57 70 L64 77 L78 62"
+                          fill="none"
+                          stroke="white"
+                          stroke-width="5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1>Student Complaint</h1>
+            <p class="subtitle">
+                Management System
+            </p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="userType">
+                        Login As
+                    </label>
+                    <select id="userType" required>
+                        <option value="">
+                            Select User Type
+                        </option>
+                        <option value="student">
+                            Student
+                        </option>
+                        <option value="admin">
+                            Administrator
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="username">
+                        Username / Email
+                    </label>
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter username or email"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="password">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        required
+                    >
+                </div>
+                <button type="submit">
+                    Login
+                </button>
+            </form>
+            <div class="register-text">
+                Don't have an account?
+                <a href="register.html">
+                    Register
+                </a>
+            </div>
+            <p id="message"></p>
+        </div>
+        <!-- Project Credit -->
+        <div class="project-credit">
+            <div class="project-name">
+                Student Complaint Management System
+            </div>
+            <div class="creator">
+                Created by Pankaj Gupta
+            </div>
+        </div>
+    </div>
+    <script>
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", function(event) {
+                event.preventDefault();
+                const userType =
+                    document.getElementById("userType").value;
+                const username =
+                    document
+                        .getElementById("username")
+                        .value
+                        .trim();
+                const password =
+                    document
+                        .getElementById("password")
+                        .value;
+                const message =
+                    document.getElementById("message");
+                message.textContent = "";
+                if (userType === "") {
+                    message.textContent =
+                        "Please select user type.";
+                    return;
+                }
+                /* ADMIN LOGIN */
+                if (userType === "admin") {
+                    const adminUsername = "admin";
+                    const adminPassword = "admin123";
+                    if (
+                        username === adminUsername &&
+                        password === adminPassword
+                    ) {
+                        localStorage.setItem(
+                            "loggedInAdmin",
+                            JSON.stringify({
+                                username: "admin"
+                            })
+                        );
+                        window.location.href =
+                            "admin.html";
+                    } else {
+                        message.textContent =
+                            "Invalid admin username or password.";
+                    }
+                    return;
+                }
+                /* STUDENT LOGIN */
+                if (userType === "student") {
+                    const students =
+                        JSON.parse(
+                            localStorage.getItem("students")
+                        ) || [];
+                    const student =
+                        students.find(function(s) {
+                            return (
+                                (
+                                    s.email === username ||
+                                    s.rollNo === username
+                                )
+                                &&
+                                s.password === password
+                            );
+                        });
+                    if (student) {
+                        localStorage.setItem(
+                            "loggedInStudent",
+                            JSON.stringify(student)
+                        );
+                        window.location.href =
+                            "student.html";
+                    } else {
+                        message.textContent =
+                            "Invalid student email/roll number or password.";
+                    }
+                }
+            });
+    </script>
+</body>
+</html>

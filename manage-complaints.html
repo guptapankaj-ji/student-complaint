@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Complaints</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding-bottom: 40px;
+        }
+        nav {
+            height: 65px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+        }
+        nav h2 {
+            font-size: 22px;
+        }
+        nav button {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #1e3a8a;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+        .heading {
+            margin-bottom: 25px;
+        }
+        .heading h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .heading p {
+            color: #cbd5e1;
+        }
+        .table-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            min-width: 1100px;
+            border-collapse: collapse;
+        }
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        th {
+            color: #93c5fd;
+            font-size: 14px;
+        }
+        td {
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 20px;
+            background: #f59e0b;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .priority {
+            font-weight: bold;
+        }
+        .high {
+            color: #f87171;
+        }
+        .medium {
+            color: #fbbf24;
+        }
+        .low {
+            color: #4ade80;
+        }
+        .update-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .update-btn:hover {
+            background: #1d4ed8;
+        }
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #cbd5e1;
+        }
+        .back-btn {
+            margin-bottom: 20px;
+            padding: 10px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        @media (max-width: 600px) {
+            .heading h1 {
+                font-size: 26px;
+            }
+            .table-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>
+            Admin Panel
+        </h2>
+        <button onclick="logout()">
+            Logout
+        </button>
+    </nav>
+    <div class="container">
+        <button
+            class="back-btn"
+            onclick="goDashboard()">
+            ← Back to Dashboard
+        </button>
+        <div class="heading">
+            <h1>
+                Manage Complaints
+            </h1>
+            <p>
+                View all complaints submitted by students.
+            </p>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            Complaint ID
+                        </th>
+                        <th>
+                            Student
+                        </th>
+                        <th>
+                            Roll No.
+                        </th>
+                        <th>
+                            Title
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            Priority
+                        </th>
+                        <th>
+                            Date
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="complaintTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        // Check Admin Login
+        const loggedInAdmin =
+            JSON.parse(
+                localStorage.getItem("loggedInAdmin")
+            );
+        if (!loggedInAdmin) {
+            alert("Please login as Admin first.");
+            window.location.href =
+                "admin-login.html";
+        }
+        // Get complaints from LocalStorage
+        const complaints =
+            JSON.parse(
+                localStorage.getItem("complaints")
+            ) || [];
+        const table =
+            document.getElementById(
+                "complaintTable"
+            );
+        // If there are no complaints
+        if (complaints.length === 0) {
+            table.innerHTML = `
+                <tr>
+                    <td
+                        colspan="9"
+                        class="empty">
+                        No complaints available.
+                    </td>
+                </tr>
+            `;
+        } else {
+            // Display complaints
+            // Latest complaint first
+            complaints
+                .slice()
+                .reverse()
+                .forEach(function(complaint) {
+                    const row =
+                        document.createElement("tr");
+                    // Priority class
+                    let priorityClass = "";
+                    if (complaint.priority === "High") {
+                        priorityClass = "high";
+                    }
+                    else if (
+                        complaint.priority === "Medium"
+                    ) {
+                        priorityClass = "medium";
+                    }
+                    else {
+                        priorityClass = "low";
+                    }
+                    row.innerHTML = `
+                        <td>
+                            ${complaint.id}
+                        </td>
+                        <td>
+                            ${complaint.studentName}
+                        </td>
+                        <td>
+                            ${complaint.rollNo}
+                        </td>
+                        <td>
+                            ${complaint.title}
+                        </td>
+                        <td>
+                            ${complaint.category}
+                        </td>
+                        <td class="priority ${priorityClass}">
+                            ${complaint.priority}
+                        </td>
+                        <td>
+                            ${complaint.date}
+                        </td>
+                        <td>
+                            <span class="status">
+                                ${complaint.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button
+                                class="update-btn"
+                                onclick="updateComplaint('${complaint.id}')">
+                                Update
+                            </button>
+                        </td>
+                    `;
+                    table.appendChild(row);
+                });
+        }
+        // Update complaint function
+        function updateComplaint(id) {
+            // Save selected complaint ID
+            localStorage.setItem(
+                "selectedComplaintId",
+                id
+            );
+            // Open status update page
+            window.location.href =
+                "update-status.html";
+        }
+        // Go back to dashboard
+        function goDashboard() {
+            window.location.href =
+                "admin.html";
+        }
+        // Logout
+        function logout() {
+            localStorage.removeItem(
+                "loggedInAdmin"
+            );
+            window.location.href =
+                "admin-login.html";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding-bottom: 40px;
+        }
+
+        nav {
+            height: 65px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        nav h2 {
+            font-size: 22px;
+        }
+
+        nav button {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #1e3a8a;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 45px auto;
+        }
+
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #cbd5e1;
+        }
+
+        /* Statistics */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            padding: 22px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+            text-align: center;
+        }
+
+        .stat-card h2 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #cbd5e1;
+        }
+
+        /* Dashboard */
+
+        .dashboard-card {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+        }
+
+        .dashboard-card h2 {
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* Manage Button */
+
+        .manage-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .manage-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        /* Recent Complaints */
+
+        .recent {
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+            overflow-x: auto;
+        }
+
+        .recent h2 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        th {
+            color: #93c5fd;
+        }
+
+        td {
+            color: #e2e8f0;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #f59e0b;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 900px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 500px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome h1 {
+                font-size: 26px;
+            }
+
+            .dashboard-card,
+            .recent {
+                padding: 20px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+
+    <nav>
+
+        <h2>
+            Admin Panel
+        </h2>
+
+        <button onclick="logout()">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <div class="container">
+
+        <!-- Welcome -->
+
+        <div class="welcome">
+
+            <h1>
+                Welcome, Admin 👋
+            </h1>
+
+            <p>
+                Manage and monitor student complaints from this dashboard.
+            </p>
+
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="stats">
+
+            <div class="stat-card">
+
+                <h2 id="totalComplaints">
+                    0
+                </h2>
+
+                <p>
+                    Total Complaints
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h2 id="pendingComplaints">
+                    0
+                </h2>
+
+                <p>
+                    Pending
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h2 id="progressComplaints">
+                    0
+                </h2>
+
+                <p>
+                    In Progress
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h2 id="resolvedComplaints">
+                    0
+                </h2>
+
+                <p>
+                    Resolved
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h2 id="rejectedComplaints">
+                    0
+                </h2>
+
+                <p>
+                    Rejected
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Manage Complaints -->
+
+        <div class="dashboard-card">
+
+            <h2>
+                Complaint Management
+            </h2>
+
+            <p>
+                View all complaints submitted by students
+                and update their status from the management section.
+            </p>
+
+            <!-- Direct link -->
+
+            <a
+                href="manage-complaints.html"
+                class="manage-btn">
+
+                Manage Complaints
+
+            </a>
+
+        </div>
+
+
+        <!-- Recent Complaints -->
+
+        <div class="recent">
+
+            <h2>
+                Recent Complaints
+            </h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Complaint ID
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Title
+                        </th>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="recentComplaints">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // =====================================
+        // CHECK ADMIN LOGIN
+        // =====================================
+
+        const loggedInAdmin =
+            JSON.parse(
+                localStorage.getItem("loggedInAdmin")
+            );
+
+
+        if (!loggedInAdmin) {
+
+            alert("Please login as Admin first.");
+
+            window.location.href =
+                "index.html";
+
+        }
+
+
+        // =====================================
+        // GET COMPLAINTS
+        // =====================================
+
+        const complaints =
+            JSON.parse(
+                localStorage.getItem("complaints")
+            ) || [];
+
+
+        // =====================================
+        // COUNT COMPLAINTS
+        // =====================================
+
+        const total =
+            complaints.length;
+
+
+        const pending =
+            complaints.filter(
+                complaint =>
+                    complaint.status === "Pending"
+            ).length;
+
+
+        const inProgress =
+            complaints.filter(
+                complaint =>
+                    complaint.status === "In Progress"
+            ).length;
+
+
+        const resolved =
+            complaints.filter(
+                complaint =>
+                    complaint.status === "Resolved"
+            ).length;
+
+
+        const rejected =
+            complaints.filter(
+                complaint =>
+                    complaint.status === "Rejected"
+            ).length;
+
+
+        // =====================================
+        // DISPLAY STATISTICS
+        // =====================================
+
+        document.getElementById(
+            "totalComplaints"
+        ).innerText = total;
+
+
+        document.getElementById(
+            "pendingComplaints"
+        ).innerText = pending;
+
+
+        document.getElementById(
+            "progressComplaints"
+        ).innerText = inProgress;
+
+
+        document.getElementById(
+            "resolvedComplaints"
+        ).innerText = resolved;
+
+
+        document.getElementById(
+            "rejectedComplaints"
+        ).innerText = rejected;
+
+
+        // =====================================
+        // RECENT COMPLAINTS
+        // =====================================
+
+        const recentTable =
+            document.getElementById(
+                "recentComplaints"
+            );
+
+
+        if (complaints.length === 0) {
+
+            recentTable.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty">
+
+                        No complaints submitted yet.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        } else {
+
+            // Latest 5 complaints
+
+            const recentComplaints =
+                complaints
+                    .slice(-5)
+                    .reverse();
+
+
+            recentComplaints.forEach(
+                complaint => {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${complaint.id}
+                        </td>
+
+                        <td>
+                            ${complaint.studentName}
+                        </td>
+
+                        <td>
+                            ${complaint.title}
+                        </td>
+
+                        <td>
+                            ${complaint.category}
+                        </td>
+
+                        <td>
+
+                            <span class="status">
+
+                                ${complaint.status}
+
+                            </span>
+
+                        </td>
+
+                    `;
+
+
+                    recentTable.appendChild(row);
+
+                }
+            );
+
+        }
+
+
+        // =====================================
+        // LOGOUT
+        // =====================================
+
+        function logout() {
+
+            localStorage.removeItem(
+                "loggedInAdmin"
+            );
+
+
+            window.location.href =
+                "index.html";
+
+        }
+
+    </script>
+
+</body>
+</html>

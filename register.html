@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #141e30, #243b55);
+        }
+        .container {
+            width: 400px;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #d5d5d5;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            outline: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #243b55;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        .login-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .login-text a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        @media (max-width: 450px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Registration</h1>
+        <p class="subtitle">
+            Create your student account
+        </p>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    placeholder="Enter your full name"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="rollNo">Roll Number</label>
+                <input
+                    type="text"
+                    id="rollNo"
+                    placeholder="Enter your roll number"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Create a password"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    placeholder="Confirm your password"
+                    required
+                >
+            </div>
+            <button type="submit">
+                Create Account
+            </button>
+        </form>
+        <p id="message"></p>
+        <div class="login-text">
+            Already have an account?
+            <a href="index.html">Login</a>
+        </div>
+    </div>
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const name = document.getElementById("name").value.trim();
+            const rollNo = document.getElementById("rollNo").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const message = document.getElementById("message");
+            // Check password
+            if (password !== confirmPassword) {
+                message.textContent = "Passwords do not match.";
+                return;
+            }
+            // Get existing students
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+            // Check duplicate email
+            const existingStudent = students.find(function(student) {
+                return student.email === email;
+            });
+            if (existingStudent) {
+                message.textContent = "Email is already registered.";
+                return;
+            }
+            // Create student object
+            const student = {
+                id: Date.now(),
+                name: name,
+                rollNo: rollNo,
+                email: email,
+                password: password
+            };
+            // Add student
+            students.push(student);
+            // Save to localStorage
+            localStorage.setItem("students", JSON.stringify(students));
+            message.textContent = "Registration successful!";
+            // Clear form
+            document.getElementById("registerForm").reset();
+            // Go to login after 1 second
+            setTimeout(function() {
+                window.location.href = "index.html";
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

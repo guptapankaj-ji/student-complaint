@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: #f4f6f9;
+        }
+        /* NAVBAR */
+        .navbar {
+            height: 70px;
+            background: #243b55;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+        }
+        .logo {
+            font-size: 21px;
+            font-weight: bold;
+        }
+        .back-btn {
+            background: white;
+            color: #243b55;
+            border: none;
+            padding: 9px 17px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        /* FORM CONTAINER */
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #243b55;
+        }
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #243b55;
+        }
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #243b55;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+        #message {
+            text-align: center;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            Student Complaint System
+        </div>
+        <button class="back-btn" onclick="goBack()">
+            ← Dashboard
+        </button>
+    </nav>
+    <!-- FORM -->
+    <div class="container">
+        <h1>Submit Complaint</h1>
+        <p class="subtitle">
+            Tell us about the issue you are facing
+        </p>
+        <form id="complaintForm">
+            <!-- TITLE -->
+            <div class="form-group">
+                <label for="title">
+                    Complaint Title
+                </label>
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Example: Classroom fan not working"
+                    required
+                >
+            </div>
+            <!-- CATEGORY + PRIORITY -->
+            <div class="row">
+                <div class="form-group">
+                    <label for="category">
+                        Category
+                    </label>
+                    <select id="category" required>
+                        <option value="">
+                            Select Category
+                        </option>
+                        <option value="Academic">
+                            Academic
+                        </option>
+                        <option value="Infrastructure">
+                            Infrastructure
+                        </option>
+                        <option value="Faculty">
+                            Faculty
+                        </option>
+                        <option value="Library">
+                            Library
+                        </option>
+                        <option value="Canteen">
+                            Canteen
+                        </option>
+                        <option value="Cleanliness">
+                            Cleanliness
+                        </option>
+                        <option value="Other">
+                            Other
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="priority">
+                        Priority
+                    </label>
+                    <select id="priority" required>
+                        <option value="">
+                            Select Priority
+                        </option>
+                        <option value="Low">
+                            Low
+                        </option>
+                        <option value="Medium">
+                            Medium
+                        </option>
+                        <option value="High">
+                            High
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <!-- LOCATION -->
+            <div class="form-group">
+                <label for="location">
+                    Location
+                </label>
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Example: Room 204 / Library"
+                    required
+                >
+            </div>
+            <!-- DESCRIPTION -->
+            <div class="form-group">
+                <label for="description">
+                    Complaint Description
+                </label>
+                <textarea
+                    id="description"
+                    placeholder="Describe your problem in detail..."
+                    required
+                ></textarea>
+            </div>
+            <!-- SUBMIT -->
+            <button
+                type="submit"
+                class="submit-btn"
+            >
+                Submit Complaint
+            </button>
+        </form>
+        <p id="message"></p>
+    </div>
+    <script>
+        // Get logged-in student
+        const loggedInStudent =
+            JSON.parse(localStorage.getItem("loggedInStudent"));
+        // If student is not logged in
+        if (!loggedInStudent) {
+            alert("Please login first.");
+            window.location.href = "index.html";
+        }
+        // Form submission
+        document.getElementById("complaintForm")
+            .addEventListener("submit", function(event) {
+                event.preventDefault();
+                // Get form values
+                const title =
+                    document.getElementById("title").value.trim();
+                const category =
+                    document.getElementById("category").value;
+                const priority =
+                    document.getElementById("priority").value;
+                const location =
+                    document.getElementById("location").value.trim();
+                const description =
+                    document.getElementById("description").value.trim();
+                // Get existing complaints
+                let complaints =
+                    JSON.parse(localStorage.getItem("complaints")) || [];
+                // Create complaint
+                const complaint = {
+                    id: "CMP" + Date.now(),
+                    studentId: loggedInStudent.id,
+                    studentName: loggedInStudent.name,
+                    studentEmail: loggedInStudent.email,
+                    rollNo: loggedInStudent.rollNo,
+                    title: title,
+                    category: category,
+                    priority: priority,
+                    location: location,
+                    description: description,
+                    date: new Date().toLocaleDateString(),
+                    status: "Pending"
+                };
+                // Save complaint
+                complaints.push(complaint);
+                localStorage.setItem(
+                    "complaints",
+                    JSON.stringify(complaints)
+                );
+                // Success message
+                const message =
+                    document.getElementById("message");
+                message.textContent =
+                    "Complaint submitted successfully!";
+                // Clear form
+                document.getElementById("complaintForm").reset();
+                // Return to dashboard
+                setTimeout(function() {
+                    window.location.href = "student.html";
+                }, 1200);
+            });
+        // Back to dashboard
+        function goBack() {
+            window.location.href = "student.html";
+        }
+    </script>
+</body>
+</html>

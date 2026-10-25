@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Complaint</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding-bottom: 40px;
+        }
+        nav {
+            height: 65px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+        }
+        nav h2 {
+            font-size: 22px;
+        }
+        nav button {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #1e3a8a;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 50px auto;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .title p {
+            color: #cbd5e1;
+        }
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 30px;
+        }
+        .search-box label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .search-box button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .search-box button:hover {
+            background: #1d4ed8;
+        }
+        .complaint-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(12px);
+        }
+        .complaint-card h2 {
+            margin-bottom: 20px;
+        }
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .info-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .info-box strong {
+            display: block;
+            color: #93c5fd;
+            margin-bottom: 5px;
+        }
+        .description {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .description strong {
+            display: block;
+            color: #93c5fd;
+            margin-bottom: 8px;
+        }
+        .status {
+            display: inline-block;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            background: #f59e0b;
+            color: white;
+        }
+        .error {
+            display: none;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .info {
+                grid-template-columns: 1fr;
+            }
+            .title h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Student Complaint System</h2>
+        <button onclick="goDashboard()">Dashboard</button>
+    </nav>
+    <div class="container">
+        <div class="title">
+            <h1>Track Complaint</h1>
+            <p>Enter your Complaint ID to check the current status.</p>
+        </div>
+        <div class="search-box">
+            <label>Complaint ID</label>
+            <input
+                type="text"
+                id="complaintId"
+                placeholder="Example: CMP1750000000000"
+            >
+            <button onclick="trackComplaint()">
+                Track Complaint
+            </button>
+        </div>
+        <div class="error" id="errorMessage">
+            Complaint not found. Please check the Complaint ID.
+        </div>
+        <div class="complaint-card" id="complaintCard">
+            <h2>Complaint Details</h2>
+            <div class="info">
+                <div class="info-box">
+                    <strong>Complaint ID</strong>
+                    <span id="showId"></span>
+                </div>
+                <div class="info-box">
+                    <strong>Title</strong>
+                    <span id="showTitle"></span>
+                </div>
+                <div class="info-box">
+                    <strong>Category</strong>
+                    <span id="showCategory"></span>
+                </div>
+                <div class="info-box">
+                    <strong>Priority</strong>
+                    <span id="showPriority"></span>
+                </div>
+                <div class="info-box">
+                    <strong>Date</strong>
+                    <span id="showDate"></span>
+                </div>
+                <div class="info-box">
+                    <strong>Status</strong>
+                    <span class="status" id="showStatus"></span>
+                </div>
+            </div>
+            <div class="description">
+                <strong>Description</strong>
+                <span id="showDescription"></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Check whether student is logged in
+        const loggedInStudent =
+            JSON.parse(localStorage.getItem("loggedInStudent"));
+        if (!loggedInStudent) {
+            alert("Please login first.");
+            window.location.href = "index.html";
+        }
+        function trackComplaint() {
+           const urlParams = new URLSearchParams(window.location.search);
+const complaintId =
+    urlParams.get("id") ||
+    localStorage.getItem("trackingComplaintId") ||
+    "";
+            const errorMessage =
+                document.getElementById("errorMessage");
+            const complaintCard =
+                document.getElementById("complaintCard");
+            // Hide previous results
+            errorMessage.style.display = "none";
+            complaintCard.style.display = "none";
+            if (complaintId === "") {
+                errorMessage.innerText =
+                    "Please enter a Complaint ID.";
+                errorMessage.style.display = "block";
+                return;
+            }
+            // Get complaints from LocalStorage
+            const complaints =
+                JSON.parse(localStorage.getItem("complaints")) || [];
+            // Find complaint
+            const complaint = complaints.find(function(item) {
+                return item.id === complaintId &&
+                    (
+                        item.studentId == loggedInStudent.id ||
+                        item.studentEmail === loggedInStudent.email ||
+                        item.rollNo === loggedInStudent.rollNo
+                    );
+            });
+            if (!complaint) {
+                errorMessage.innerText =
+                    "Complaint not found. Please check the Complaint ID.";
+                errorMessage.style.display = "block";
+                return;
+            }
+            // Display complaint details
+            document.getElementById("showId").innerText =
+                complaint.id;
+            document.getElementById("showTitle").innerText =
+                complaint.title;
+            document.getElementById("showCategory").innerText =
+                complaint.category;
+            document.getElementById("showPriority").innerText =
+                complaint.priority;
+            document.getElementById("showDate").innerText =
+                complaint.date;
+            document.getElementById("showStatus").innerText =
+                complaint.status;
+            document.getElementById("showDescription").innerText =
+                complaint.description;
+            complaintCard.style.display = "block";
+        }
+        function goDashboard() {
+            window.location.href = "student.html";
+        }
+    </script>
+</body>
+</html>

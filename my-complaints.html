@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding-bottom: 40px;
+        }
+        nav {
+            min-height: 65px;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 7%;
+        }
+        nav h2 {
+            font-size: 21px;
+        }
+        nav a {
+            text-decoration: none;
+            color: white;
+            background: #2563eb;
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .complaints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .complaint-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 22px;
+            transition: 0.3s;
+        }
+        .complaint-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .complaint-card h3 {
+            margin-bottom: 15px;
+            color: #93c5fd;
+        }
+        .detail {
+            margin: 9px 0;
+            line-height: 1.5;
+        }
+        .detail strong {
+            color: #cbd5e1;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .pending {
+            background: #facc15;
+            color: #422006;
+        }
+        .progress {
+            background: #60a5fa;
+            color: #172554;
+        }
+        .resolved {
+            background: #4ade80;
+            color: #052e16;
+        }
+        .rejected {
+            background: #f87171;
+            color: #450a0a;
+        }
+        .empty {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+        }
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        @media (max-width: 600px) {
+            nav h2 {
+                font-size: 17px;
+            }
+            nav a {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>Student Complaint System</h2>
+        <a href="student.html">
+            Dashboard
+        </a>
+    </nav>
+    <div class="container">
+        <h1>My Complaints</h1>
+        <div class="complaints" id="complaintsContainer"></div>
+    </div>
+    <script>
+        // Check logged-in student
+        const loggedInStudent =
+            JSON.parse(
+                localStorage.getItem("loggedInStudent")
+            );
+        if (!loggedInStudent) {
+            alert("Please login first.");
+            window.location.href =
+                "index.html";
+        }
+        // Get complaints
+        const complaints =
+            JSON.parse(
+                localStorage.getItem("complaints")
+            ) || [];
+        // Find student's complaints
+        const studentComplaints =
+            complaints.filter(item =>
+                item.studentId == loggedInStudent.id ||
+                item.studentEmail === loggedInStudent.email ||
+                item.rollNo === loggedInStudent.rollNo
+            );
+        const container =
+            document.getElementById(
+                "complaintsContainer"
+            );
+        // No complaints
+        if (studentComplaints.length === 0) {
+            container.innerHTML = `
+                <div class="empty">
+                    <h2>No Complaints Found</h2>
+                    <p>You have not submitted any complaint yet.</p>
+                </div>
+            `;
+        } else {
+            // Display latest complaint first
+            studentComplaints.reverse();
+            studentComplaints.forEach(complaint => {
+                let statusClass = "pending";
+                if (complaint.status === "In Progress") {
+                    statusClass = "progress";
+                }
+                else if (complaint.status === "Resolved") {
+                    statusClass = "resolved";
+                }
+                else if (complaint.status === "Rejected") {
+                    statusClass = "rejected";
+                }
+                container.innerHTML += `
+                    <div class="complaint-card">
+                        <h3>
+                            ${complaint.title}
+                        </h3>
+                        <div class="detail">
+                            <strong>ID:</strong>
+                            ${complaint.id}
+                        </div>
+                        <div class="detail">
+                            <strong>Category:</strong>
+                            ${complaint.category}
+                        </div>
+                        <div class="detail">
+                            <strong>Priority:</strong>
+                            ${complaint.priority}
+                        </div>
+                        <div class="detail">
+                            <strong>Location:</strong>
+                            ${complaint.location}
+                        </div>
+                        <div class="detail">
+                            <strong>Date:</strong>
+                            ${complaint.date}
+                        </div>
+                        <div class="detail">
+                            <strong>Status:</strong>
+                            <span class="status ${statusClass}">
+                                ${complaint.status}
+                            </span>
+                        </div>
+                        <button
+                            onclick="trackComplaint('${complaint.id}')">
+                            Track Complaint
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        // Track complaint
+        function trackComplaint(id) {
+            // Store selected ID
+            localStorage.setItem(
+                "trackingComplaintId",
+                id
+            );
+            // Put ID in tracking page
+            window.location.href =
+                "tracking.html?id=" + encodeURIComponent(id);
+        }
+    </script>
+</body>
+</html>

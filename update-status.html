@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Complaint Status</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding-bottom: 40px;
+        }
+        nav {
+            height: 65px;
+            background: rgba(15, 23, 42, 0.85);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+            backdrop-filter: blur(10px);
+        }
+        nav h2 {
+            font-size: 22px;
+        }
+        nav a {
+            text-decoration: none;
+            color: white;
+            background: #2563eb;
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .detail {
+            margin-bottom: 18px;
+        }
+        .detail strong {
+            display: block;
+            color: #93c5fd;
+            margin-bottom: 5px;
+        }
+        .detail span,
+        .detail p {
+            color: #f8fafc;
+        }
+        .description {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+        label {
+            display: block;
+            margin-top: 25px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        .error {
+            text-align: center;
+            color: #fca5a5;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h2>
+            Student Complaint System
+        </h2>
+        <a href="manage-complaints.html">
+            Back
+        </a>
+    </nav>
+    <div class="container">
+        <div class="card" id="complaintBox">
+            <h1>
+                Update Complaint
+            </h1>
+            <div class="detail">
+                <strong>
+                    Complaint ID
+                </strong>
+                <span id="complaintId"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Student Name
+                </strong>
+                <span id="studentName"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Roll Number
+                </strong>
+                <span id="rollNo"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Complaint Title
+                </strong>
+                <span id="title"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Category
+                </strong>
+                <span id="category"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Priority
+                </strong>
+                <span id="priority"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Location
+                </strong>
+                <span id="location"></span>
+            </div>
+            <div class="detail">
+                <strong>
+                    Description
+                </strong>
+                <p
+                    class="description"
+                    id="description">
+                </p>
+            </div>
+            <div class="detail">
+                <strong>
+                    Current Status
+                </strong>
+                <span id="currentStatus"></span>
+            </div>
+            <label for="status">
+                Update Status
+            </label>
+            <select id="status">
+                <option value="Pending">
+                    Pending
+                </option>
+                <option value="In Progress">
+                    In Progress
+                </option>
+                <option value="Resolved">
+                    Resolved
+                </option>
+                <option value="Rejected">
+                    Rejected
+                </option>
+            </select>
+            <label for="remark">
+                Admin Remark
+            </label>
+            <textarea
+                id="remark"
+                placeholder="Enter a remark for the student...">
+            </textarea>
+            <button onclick="updateStatus()">
+                Update Status & Save Remark
+            </button>
+        </div>
+    </div>
+    <script>
+        /* =========================
+           CHECK ADMIN LOGIN
+        ========================= */
+        const loggedInAdmin =
+            JSON.parse(
+                localStorage.getItem("loggedInAdmin")
+            );
+        if (!loggedInAdmin) {
+            window.location.href =
+                "admin-login.html";
+        }
+        /* =========================
+           GET SELECTED COMPLAINT
+        ========================= */
+        const selectedComplaintId =
+            localStorage.getItem(
+                "selectedComplaintId"
+            );
+        /* =========================
+           GET ALL COMPLAINTS
+        ========================= */
+        let complaints =
+            JSON.parse(
+                localStorage.getItem("complaints")
+            ) || [];
+        /* =========================
+           FIND COMPLAINT
+        ========================= */
+        const complaint =
+            complaints.find(
+                item =>
+                    item.id ===
+                    selectedComplaintId
+            );
+        /* =========================
+           IF COMPLAINT NOT FOUND
+        ========================= */
+        if (!complaint) {
+            document.getElementById(
+                "complaintBox"
+            ).innerHTML = `
+                <div class="error">
+                    Complaint not found.
+                </div>
+            `;
+        }
+        /* =========================
+           DISPLAY COMPLAINT
+        ========================= */
+        else {
+            document.getElementById(
+                "complaintId"
+            ).textContent =
+                complaint.id;
+            document.getElementById(
+                "studentName"
+            ).textContent =
+                complaint.studentName;
+            document.getElementById(
+                "rollNo"
+            ).textContent =
+                complaint.rollNo;
+            document.getElementById(
+                "title"
+            ).textContent =
+                complaint.title;
+            document.getElementById(
+                "category"
+            ).textContent =
+                complaint.category;
+            document.getElementById(
+                "priority"
+            ).textContent =
+                complaint.priority;
+            document.getElementById(
+                "location"
+            ).textContent =
+                complaint.location;
+            document.getElementById(
+                "description"
+            ).textContent =
+                complaint.description;
+            document.getElementById(
+                "currentStatus"
+            ).textContent =
+                complaint.status;
+            /* Current status select */
+            document.getElementById(
+                "status"
+            ).value =
+                complaint.status;
+            /* Existing admin remark */
+            document.getElementById(
+                "remark"
+            ).value =
+                complaint.adminRemark || "";
+        }
+        /* =========================
+           UPDATE STATUS
+           + ADMIN REMARK
+           + NOTIFICATION
+        ========================= */
+        function updateStatus() {
+            if (!complaint) {
+                return;
+            }
+            /* Get new values */
+            const newStatus =
+                document.getElementById(
+                    "status"
+                ).value;
+            const adminRemark =
+                document.getElementById(
+                    "remark"
+                ).value.trim();
+            /* Find complaint index */
+            const complaintIndex =
+                complaints.findIndex(
+                    item =>
+                        item.id ===
+                        selectedComplaintId
+                );
+            if (complaintIndex === -1) {
+                alert(
+                    "Complaint not found."
+                );
+                return;
+            }
+            /* =========================
+               CHECK WHETHER SOMETHING
+               ACTUALLY CHANGED
+            ========================= */
+            const oldStatus =
+                complaints[
+                    complaintIndex
+                ].status;
+            const oldRemark =
+                complaints[
+                    complaintIndex
+                ].adminRemark || "";
+            const statusChanged =
+                oldStatus !== newStatus;
+            const remarkChanged =
+                oldRemark !== adminRemark;
+            /* =========================
+               UPDATE COMPLAINT
+            ========================= */
+            complaints[
+                complaintIndex
+            ].status =
+                newStatus;
+            complaints[
+                complaintIndex
+            ].adminRemark =
+                adminRemark;
+            /* Save update time */
+            complaints[
+                complaintIndex
+            ].updatedAt =
+                new Date().toLocaleString();
+            /* =========================
+               SAVE COMPLAINTS
+            ========================= */
+            localStorage.setItem(
+                "complaints",
+                JSON.stringify(
+                    complaints
+                )
+            );
+            /* =========================
+               CREATE NOTIFICATION
+               ONLY IF STATUS OR
+               REMARK CHANGED
+            ========================= */
+            if (
+                statusChanged ||
+                remarkChanged
+            ) {
+                /* Get existing notifications */
+                let notifications =
+                    JSON.parse(
+                        localStorage.getItem(
+                            "notifications"
+                        )
+                    ) || [];
+                /* Create new notification */
+                const newNotification = {
+                    id: Date.now(),
+                    studentId:
+                        complaints[
+                            complaintIndex
+                        ].studentId,
+                    complaintId:
+                        complaints[
+                            complaintIndex
+                        ].id,
+                    title:
+                        "Complaint Updated",
+                    message:
+                        "Your complaint " +
+                        complaints[
+                            complaintIndex
+                        ].id +
+                        " is now " +
+                        newStatus +
+                        ".",
+                    remark:
+                        adminRemark,
+                    date:
+                        new Date().toLocaleString(),
+                    read:
+                        false
+                };
+                /* Add notification at top */
+                notifications.unshift(
+                    newNotification
+                );
+                /* Save notifications */
+                localStorage.setItem(
+                    "notifications",
+                    JSON.stringify(
+                        notifications
+                    )
+                );
+            }
+            /* =========================
+               SUCCESS MESSAGE
+            ========================= */
+            alert(
+                "Complaint updated successfully!\n\n" +
+                "Student notification has been created."
+            );
+            /* Remove selected complaint */
+            localStorage.removeItem(
+                "selectedComplaintId"
+            );
+            /* Go back to manage complaints */
+            window.location.href =
+                "manage-complaints.html";
+        }
+    </script>
+</body>
+</html>

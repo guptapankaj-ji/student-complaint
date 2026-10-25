@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            color: #ffffff;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(74, 222, 128, 0.18), transparent 28%),
+                radial-gradient(circle at 85% 15%, rgba(96, 165, 250, 0.20), transparent 30%),
+                radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.15), transparent 30%),
+                linear-gradient(135deg, #07111f, #101b2d, #17243a);
+            overflow-x: hidden;
+        }
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.25;
+            z-index: -1;
+        }
+        body::before {
+            background: #4ade80;
+            top: 5%;
+            left: -100px;
+        }
+        body::after {
+            background: #8b5cf6;
+            right: -100px;
+            bottom: 5%;
+        }
+        .sticker {
+            position: fixed;
+            font-size: 35px;
+            opacity: 0.18;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .sticker.one {
+            top: 130px;
+            left: 4%;
+            transform: rotate(-15deg);
+        }
+        .sticker.two {
+            top: 45%;
+            right: 4%;
+            transform: rotate(15deg);
+        }
+        .sticker.three {
+            bottom: 80px;
+            left: 8%;
+            transform: rotate(10deg);
+        }
+        /* NAVBAR */
+        nav {
+            width: 100%;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 20, 35, 0.72);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .nav-title {
+            font-size: 21px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .notification-btn,
+        .logout-btn {
+            border: none;
+            cursor: pointer;
+            color: white;
+            border-radius: 12px;
+            transition: 0.25s;
+        }
+        .notification-btn {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            font-size: 19px;
+            background: rgba(255,255,255,0.08);
+        }
+        .notification-btn:hover {
+            background: rgba(74,222,128,0.18);
+            transform: translateY(-2px);
+        }
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 19px;
+            height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ef4444;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .logout-btn {
+            padding: 11px 18px;
+            background: rgba(239,68,68,0.15);
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+        .logout-btn:hover {
+            background: rgba(239,68,68,0.3);
+            transform: translateY(-2px);
+        }
+        /* MAIN */
+        .container {
+            width: 86%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 55px 0 20px;
+        }
+        .welcome {
+            margin-bottom: 35px;
+        }
+        .welcome h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .welcome p {
+            color: #aeb8c7;
+            font-size: 16px;
+        }
+        /* CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+        .card {
+            padding: 28px;
+            min-height: 190px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.11);
+            border-radius: 22px;
+            backdrop-filter: blur(18px);
+            transition: 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-7px);
+            border-color: rgba(74,222,128,0.35);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+        }
+        .card-icon {
+            font-size: 34px;
+            margin-bottom: 17px;
+        }
+        .card h2 {
+            font-size: 21px;
+            margin-bottom: 9px;
+        }
+        .card p {
+            color: #aeb8c7;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .card button {
+            border: none;
+            padding: 10px 17px;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #4ade80;
+            color: #07111f;
+            font-weight: bold;
+            transition: 0.25s;
+        }
+        .card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74,222,128,0.25);
+        }
+        /* STUDENT INFO */
+        .info-section {
+            margin-top: 35px;
+            padding: 28px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 22px;
+            backdrop-filter: blur(18px);
+        }
+        .info-section h2 {
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .info-box {
+            padding: 17px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.05);
+        }
+        .info-label {
+            color: #8f9bad;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+        .info-value {
+            font-size: 15px;
+            word-break: break-word;
+        }
+        /* NOTIFICATIONS */
+        .notifications {
+            margin-top: 35px;
+            padding: 28px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 22px;
+            backdrop-filter: blur(18px);
+        }
+        .notification-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .notification-heading h2 {
+            font-size: 22px;
+        }
+        .mark-read-btn {
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            padding: 9px 13px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .mark-read-btn:hover {
+            background: rgba(255,255,255,0.13);
+        }
+        .notification-item {
+            padding: 18px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.045);
+            border-radius: 14px;
+            border-left: 3px solid transparent;
+        }
+        .notification-item.unread {
+            border-left-color: #4ade80;
+            background: rgba(74,222,128,0.07);
+        }
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .notification-message {
+            color: #c1c9d5;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .notification-remark {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 9px;
+            background: rgba(96,165,250,0.08);
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+        .notification-date {
+            margin-top: 10px;
+            color: #7f8a9b;
+            font-size: 11px;
+        }
+        .no-notifications {
+            text-align: center;
+            padding: 25px;
+            color: #8f9bad;
+        }
+        /* FOOTER */
+        .project-credit {
+            text-align: center;
+            margin: 55px 0 25px;
+            padding: 20px;
+        }
+        .project-name {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            color: #ffffff;
+        }
+        .creator {
+            margin-top: 7px;
+            font-size: 12px;
+            color: #8995a8;
+        }
+        /* RESPONSIVE */
+        @media (max-width: 800px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .welcome h1 {
+                font-size: 29px;
+            }
+            nav {
+                padding: 15px 5%;
+            }
+            .nav-title {
+                font-size: 17px;
+            }
+        }
+        @media (max-width: 500px) {
+            .container {
+                width: 90%;
+                padding-top: 35px;
+            }
+            .notification-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .logout-btn {
+                padding: 9px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorative stickers -->
+    <div class="sticker one">✦</div>
+    <div class="sticker two">✎</div>
+    <div class="sticker three">★</div>
+    <!-- NAVBAR -->
+    <nav>
+        <div class="nav-title">
+            Student Dashboard
+        </div>
+        <div class="nav-right">
+            <button class="notification-btn" onclick="scrollToNotifications()">
+                🔔
+                <span id="notificationCount" class="notification-count">0</span>
+            </button>
+            <button class="logout-btn" onclick="logout()">
+                Logout
+            </button>
+        </div>
+    </nav>
+    <main class="container">
+        <!-- WELCOME -->
+        <div class="welcome">
+            <h1>Welcome, <span id="studentName">Student</span> 👋</h1>
+            <p>Manage your complaints and track their progress from here.</p>
+        </div>
+        <!-- MAIN CARDS -->
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">📝</div>
+                <h2>Submit Complaint</h2>
+                <p>
+                    Report a new issue or complaint to the administration.
+                </p>
+                <button onclick="submitComplaint()">
+                    Submit
+                </button>
+            </div>
+            <div class="card">
+                <div class="card-icon">📋</div>
+                <h2>My Complaints</h2>
+                <p>
+                    View all complaints submitted by you.
+                </p>
+                <button onclick="viewComplaints()">
+                    View
+                </button>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔎</div>
+                <h2>Track Complaint</h2>
+                <p>
+                    Check the current status of your complaint.
+                </p>
+                <button onclick="trackComplaint()">
+                    Track
+                </button>
+            </div>
+        </div>
+        <!-- STUDENT INFORMATION -->
+        <section class="info-section">
+            <h2>Student Information</h2>
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value" id="infoName">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Roll Number</div>
+                    <div class="info-value" id="infoRoll">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Email</div>
+                    <div class="info-value" id="infoEmail">-</div>
+                </div>
+            </div>
+        </section>
+        <!-- NOTIFICATION CENTER -->
+        <section class="notifications" id="notificationSection">
+            <div class="notification-heading">
+                <h2>🔔 Notification Center</h2>
+                <button class="mark-read-btn" onclick="markAllAsRead()">
+                    Mark All as Read
+                </button>
+            </div>
+            <div id="notificationList"></div>
+        </section>
+        <!-- PROJECT CREDIT -->
+        <div class="project-credit">
+            <div class="project-name">
+                Student Complaint Management System
+            </div>
+            <div class="creator">
+                Created by Pankaj Gupta
+            </div>
+        </div>
+    </main>
+    <script>
+        // Check logged-in student
+        const loggedInStudent =
+            JSON.parse(localStorage.getItem("loggedInStudent"));
+        if (!loggedInStudent) {
+            window.location.href = "index.html";
+        }
+        // Student information
+        document.getElementById("studentName").textContent =
+            loggedInStudent.name;
+        document.getElementById("infoName").textContent =
+            loggedInStudent.name;
+        document.getElementById("infoRoll").textContent =
+            loggedInStudent.rollNo;
+        document.getElementById("infoEmail").textContent =
+            loggedInStudent.email;
+        // Navigation functions
+        function submitComplaint() {
+            window.location.href = "complaint.html";
+        }
+        function viewComplaints() {
+            window.location.href = "my-complaints.html";
+        }
+        function trackComplaint() {
+            window.location.href = "tracking.html";
+        }
+        // Load notifications
+        function loadNotifications() {
+            const notifications =
+                JSON.parse(localStorage.getItem("notifications")) || [];
+            const studentNotifications =
+                notifications.filter(function(notification) {
+                    return notification.studentId == loggedInStudent.id ||
+                           notification.studentEmail == loggedInStudent.email ||
+                           notification.rollNo == loggedInStudent.rollNo;
+                });
+            const notificationList =
+                document.getElementById("notificationList");
+            const notificationCount =
+                document.getElementById("notificationCount");
+            const unreadNotifications =
+                studentNotifications.filter(function(notification) {
+                    return notification.read === false;
+                });
+            if (unreadNotifications.length > 0) {
+                notificationCount.textContent =
+                    unreadNotifications.length;
+                notificationCount.style.display = "flex";
+            } else {
+                notificationCount.style.display = "none";
+            }
+            if (studentNotifications.length === 0) {
+                notificationList.innerHTML =
+                    `<div class="no-notifications">
+                        No notifications available.
+                    </div>`;
+                return;
+            }
+            notificationList.innerHTML = "";
+            studentNotifications.forEach(function(notification) {
+                const notificationDiv =
+                    document.createElement("div");
+                notificationDiv.className =
+                    "notification-item " +
+                    (!notification.read ? "unread" : "");
+                notificationDiv.innerHTML = `
+                    <div class="notification-title">
+                        🔔 ${notification.title}
+                    </div>
+                    <div class="notification-message">
+                        ${notification.message}
+                    </div>
+                    ${
+                        notification.remark
+                        ?
+                        `<div class="notification-remark">
+                            <strong>Admin Remark:</strong>
+                            ${notification.remark}
+                        </div>`
+                        :
+                        ""
+                    }
+                    <div class="notification-date">
+                        ${notification.date}
+                    </div>
+                `;
+                notificationList.appendChild(notificationDiv);
+            });
+        }
+        // Mark notifications as read
+        function markAllAsRead() {
+            let notifications =
+                JSON.parse(localStorage.getItem("notifications")) || [];
+            notifications.forEach(function(notification) {
+                if (
+                    notification.studentId == loggedInStudent.id ||
+                    notification.studentEmail == loggedInStudent.email ||
+                    notification.rollNo == loggedInStudent.rollNo
+                ) {
+                    notification.read = true;
+                }
+            });
+            localStorage.setItem(
+                "notifications",
+                JSON.stringify(notifications)
+            );
+            loadNotifications();
+        }
+        // Scroll to notification center
+        function scrollToNotifications() {
+            document
+                .getElementById("notificationSection")
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+        }
+        // Logout
+        function logout() {
+            localStorage.removeItem("loggedInStudent");
+            window.location.href = "index.html";
+        }
+        // Initial load
+        loadNotifications();
+    </script>
+</body>
+</html>
